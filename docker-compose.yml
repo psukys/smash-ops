@@ -1,0 +1,41 @@
+version: '3'
+services:
+  app:
+    build: .
+    depends_on:
+      - db
+    networks:
+      - db
+      - web
+    env_file:
+      - env
+    # volumes:
+    #   - ../smash:/opt/smash
+
+  nginx:
+    image: "nginx:1.13.5"
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - web
+
+  db:
+    image: "postgres:9.6.5"
+    volumes:
+      - "db:/var/lib/postgresql/data"
+    networks:
+      - db
+    env_file:
+      - env
+
+networks:
+  db:
+    driver: bridge
+  web:
+    driver: bridge
+volumes:
+  db:
